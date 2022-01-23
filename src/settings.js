@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: 'Vue Admin Template',
+  title: '一粒麦子管理系统',
 
   /**
    * @type {boolean} true | false

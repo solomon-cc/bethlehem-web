@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 <template>
   <div class="navbar">
     <hamburger
@@ -11,7 +12,7 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar + '?imageView2/1/w/80/h/80'" class="user-avatar" />
+          <img src="https://picsum.photos/id/103/80/80" class="user-avatar" />
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -29,6 +30,8 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { Logout } from "@/api/user";
+
 import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
 
@@ -44,9 +47,13 @@ export default {
     toggleSideBar() {
       this.$store.dispatch("app/toggleSideBar");
     },
-    async logout() {
-      await this.$store.dispatch("user/logout");
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`);
+    logout() {
+      Logout().then(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+        // resetRouter();
+        this.$router.push("/login");
+      });
     },
   },
 };

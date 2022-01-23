@@ -1,3 +1,5 @@
+export * from './config'
+
 /**
  * Created by PanJiaChen on 16/11/18.
  */
@@ -45,7 +47,7 @@ export function parseTime(time, cFormat) {
   const time_str = format.replace(/{([ymdhisa])+}/g, (result, key) => {
     const value = formatObj[key]
     // Note: getDay() returns 0 on Sunday
-    if (key === 'a') { return ['日', '一', '二', '三', '四', '五', '六'][value ] }
+    if (key === 'a') { return ['日', '一', '二', '三', '四', '五', '六'][value] }
     return value.toString().padStart(2, '0')
   })
   return time_str
@@ -114,4 +116,35 @@ export function param2Obj(url) {
     }
   })
   return obj
+}
+
+import moment from 'moment'
+
+export function utc2beijing(utcTime) {
+  const time = moment(utcTime * 1000).format('YYYY-MM-DD HH:mm')
+  return time
+}
+
+export function typeFilter(object) {
+  let type = ''
+  if (object == 1) {
+    type = 'success'
+  } else if (object == 2) {
+    type = 'brand color'
+  } else if (object == 0) {
+    type = 'danger'
+  }
+  return type
+}
+
+export function statusFilter(object) {
+  let status = ''
+  if (object == 1) {
+    status = '个训'
+  } else if (object == 2) {
+    status = '集体'
+  } else if (object == 0) {
+    status = '缺勤'
+  }
+  return status
 }

@@ -33,6 +33,7 @@ import Layout from '@/layout'
 export const constantRoutes = [
   {
     path: '/login',
+    name: 'login',
     component: () => import('@/views/login/index'),
     hidden: true
   },
@@ -56,49 +57,47 @@ export const constantRoutes = [
   },
 
   {
-    path: '/example',
+    path: '/class',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'el-icon-s-help' },
+    redirect: '/class/record',
+    name: 'Class',
+    meta: { title: '课时管理', icon: 'el-icon-s-help' },
     children: [
       {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
+        path: 'record',
+        name: 'record',
+        component: () => import('@/views/class/Record'),
+        meta: { title: '课时记录', icon: 'table' }
+      },
+      {
+        path: 'todo',
+        name: 'todo',
+        meta: { title: 'todo', icon: 'tree' }
       }
     ]
   },
 
   {
-    path: '/form',
+    path: '/user',
     component: Layout,
+    redirect: '/user/student',
+    meta: { title: '用户管理', icon: 'user' },
     children: [
       {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
-      }
-    ]
-  },
+        path: 'student',
+        name: 'Student',
+        component: () => import('@/views/user/Student'),
+        meta: { title: '学生管理', icon: 'user' }
 
-  {
-    path: '/nested',
-    component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
-    meta: {
-      title: 'Nested',
-      icon: 'nested'
-    },
-    children: [
+      },
       {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        name: 'Menu2',
-        meta: { title: 'menu2' }
+        path: 'teacher',
+        name: 'Teacher',
+        component: () => import('@/views/user/Student'),
+        meta: {
+          title: '教师管理', icon: 'el-icon-s-check'
+        }
+
       }
     ]
   },
@@ -108,7 +107,7 @@ export const constantRoutes = [
 ]
 
 const createRouter = () => new Router({
-  // mode: 'history', // require service support
+  mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })
