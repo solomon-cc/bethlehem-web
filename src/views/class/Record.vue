@@ -66,11 +66,9 @@
           </el-select>
         </el-col>
         <el-col :span="4">
-          <el-button
-            type="primary"
-            icon="el-icon-search"
-            @click="queryRecord"
-          >搜索</el-button>
+          <el-button type="primary" icon="el-icon-search" @click="queryRecord"
+            >搜索</el-button
+          >
         </el-col>
       </el-col>
 
@@ -94,21 +92,21 @@
               <el-tag
                 :type="scope.row.status | colorFilter"
                 disable-transitions
-              >{{ scope.row.status | Status }}</el-tag>
+                >{{ scope.row.status | Status }}</el-tag
+              >
             </template>
           </el-table-column>
           <el-table-column fixed="right" label="操作" width="100">
             <template slot-scope="scope">
-              <el-button
-                type="text"
-                size="small"
-                @click="handleEdit(scope.row)"
-              >编辑</el-button>
+              <el-button type="text" size="small" @click="handleEdit(scope.row)"
+                >编辑</el-button
+              >
               <el-button
                 type="text"
                 size="small"
                 @click="handleDelete(scope.row)"
-              >删除</el-button>
+                >删除</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -187,80 +185,80 @@
 </template>
 
 <script>
-import { typeFilter, statusFilter } from '@/utils'
-import { listRecord, deleteRecord, updateRecord } from '@/api/record'
-import { studentListAll } from '@/api/student'
-import { userList } from '@/api/user'
+import { typeFilter, statusFilter } from "@/utils";
+import { listRecord, deleteRecord, updateRecord } from "@/api/record";
+import { studentListAll } from "@/api/student";
+import { userList } from "@/api/user";
 
-import moment from 'moment'
+import moment from "moment";
 
 export default {
   filters: {
     colorFilter(object) {
-      const type = typeFilter(object)
-      return type
+      const type = typeFilter(object);
+      return type;
     },
     transferTime(utcTime) {
-      const time = moment(utcTime).format('YYYY-MM-DD HH:mm:ss')
-      return time
+      const time = moment(utcTime).format("YYYY-MM-DD HH:mm:ss");
+      return time;
     },
 
     Status(object) {
-      const status = statusFilter(object)
-      return status
-    }
+      const status = statusFilter(object);
+      return status;
+    },
   },
   data() {
     return {
       pickerOptions: {
         shortcuts: [
           {
-            text: '最近一周',
+            text: "最近一周",
             onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-              picker.$emit('pick', [start, end])
-            }
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            },
           },
           {
-            text: '最近一个月',
+            text: "最近一个月",
             onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-              picker.$emit('pick', [start, end])
-            }
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            },
           },
           {
-            text: '最近三个月',
+            text: "最近三个月",
             onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-              picker.$emit('pick', [start, end])
-            }
-          }
-        ]
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+        ],
       },
-      date: '',
+      date: "",
       query_form: {
-        user_name: '',
-        student_name: '',
-        start_at: '',
-        end_at: '',
-        search: '',
-        status: '',
+        user_name: "",
+        student_name: "",
+        start_at: "",
+        end_at: "",
+        search: "",
+        status: "",
         page_num: 1,
-        page_size: 20
+        page_size: 20,
       },
       form: {
-        id: '',
-        created_at: '',
-        student_id: '',
-        user_name: '',
-        nick_name: '',
-        status: 0
+        id: "",
+        created_at: "",
+        student_id: "",
+        user_name: "",
+        nick_name: "",
+        status: 0,
       },
       total: 0,
       student_list: [],
@@ -268,19 +266,19 @@ export default {
       status_option: [
         {
           ID: 0,
-          name: '缺席'
+          name: "缺席",
         },
         {
           ID: 1,
-          name: '个训'
+          name: "个训",
         },
         {
           ID: 2,
-          name: '集体'
-        }
+          name: "集体",
+        },
       ],
-      title: '',
-      createdAt: '',
+      title: "",
+      createdAt: "",
       open: false,
       tableData: [],
       loading: true,
@@ -288,110 +286,110 @@ export default {
       isEdit: false,
       rules: {
         status: [
-          { required: true, message: '课程类型不能为空', trigger: 'blur' }
-        ]
-      }
-    }
+          { required: true, message: "课程类型不能为空", trigger: "blur" },
+        ],
+      },
+    };
   },
   mounted() {
-    this.queryRecord()
-    this.getStudentList()
-    this.getUsertList()
+    this.queryRecord();
+    this.getStudentList();
+    this.getUsertList();
   },
   methods: {
     queryRecord() {
       if (this.date == null) {
-        this.reset()
+        this.reset();
       }
       if (this.date.length !== 0) {
         this.query_form.start_at = moment(this.date[0]).format(
-          'YYYY-MM-DD HH:mm:ss'
-        )
+          "YYYY-MM-DD HH:mm:ss"
+        );
         this.query_form.end_at = moment(this.date[1]).format(
-          'YYYY-MM-DD HH:mm:ss'
-        )
+          "YYYY-MM-DD HH:mm:ss"
+        );
       }
 
       this.query_form.search =
         this.query_form.user_name +
         this.query_form.student_name +
-        this.query_form.status
+        this.query_form.status;
       listRecord(this.query_form).then((res) => {
-        this.tableData = res.data.data
-        this.total = res.data.total
-        this.loading = false
-      })
+        this.tableData = res.data.data;
+        this.total = res.data.total;
+        this.loading = false;
+      });
     },
     submitForm() {
-      this.$refs['form'].validate((valid) => {
+      this.$refs["form"].validate((valid) => {
         if (valid) {
           if (this.isEdit) {
             updateRecord(this.form).then((res) => {
               if (res.code == 200) {
-                this.$message.success('更新成功')
-                this.open = false
-                this.queryRecord()
+                this.$message.success("更新成功");
+                this.open = false;
+                this.queryRecord();
               }
-            })
+            });
           }
         }
-      })
+      });
     },
     getStudentList() {
       studentListAll({}).then((res) => {
-        this.student_list = res.data
-      })
+        this.student_list = res.data;
+      });
     },
     getUsertList() {
       userList({}).then((res) => {
-        this.teacher_list = res.data
-      })
+        this.teacher_list = res.data;
+      });
     },
-    handleSizeChange: function(size) {
-      this.query_form.page_size = size
-      this.queryRecord()
+    handleSizeChange: function (size) {
+      this.query_form.page_size = size;
+      this.queryRecord();
     },
-    handleCurrentChange: function(currentPage) {
-      this.query_form.page_num = currentPage
-      this.queryRecord()
+    handleCurrentChange: function (currentPage) {
+      this.query_form.page_num = currentPage;
+      this.queryRecord();
     },
 
     handleDelete(row) {
-      this.$confirm('确认移除记录?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("确认移除记录?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       }).then(() => {
         deleteRecord(row).then((res) => {
-          if (res.data.code === 200) {
-            this.$message.success('删除成功')
-            this.queryRecord()
+          if (res.code === 200) {
+            this.$message.success("删除成功");
+            this.queryRecord();
           }
-        })
-      })
+        });
+      });
     },
     handleEdit(row) {
-      this.open = true
-      this.isEdit = true
-      this.title = row.nick_name
+      this.open = true;
+      this.isEdit = true;
+      this.title = row.nick_name;
 
-      this.form.created_at = row.created_at
-      this.form.id = row.id
-      this.form.student_id = row.student_id
-      this.form.status = row.status
-      this.form.nick_name = row.nick_name
-      this.form.user_name = row.user_name
+      this.form.created_at = row.created_at;
+      this.form.id = row.id;
+      this.form.student_id = row.student_id;
+      this.form.status = row.status;
+      this.form.nick_name = row.nick_name;
+      this.form.user_name = row.user_name;
     },
     cancel() {
-      this.open = false
+      this.open = false;
     },
     reset() {
-      this.date = ''
-      this.query_form.start_at = ''
-      this.query_form.end_at = ''
-    }
-  }
-}
+      this.date = "";
+      this.query_form.start_at = "";
+      this.query_form.end_at = "";
+    },
+  },
+};
 </script>
 <style scoped>
 .query-select {
