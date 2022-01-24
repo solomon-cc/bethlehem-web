@@ -93,7 +93,7 @@ export const constantRoutes = [
       {
         path: 'teacher',
         name: 'Teacher',
-        component: () => import('@/views/user/Student'),
+        component: () => import('@/views/user/Teacher'),
         meta: {
           title: '教师管理', icon: 'el-icon-s-check'
         }
