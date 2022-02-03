@@ -313,6 +313,7 @@ export default {
       this.query_form.search =
         this.query_form.user_name +
         this.query_form.student_name +
+        "%" +
         this.query_form.status;
       listRecord(this.query_form).then((res) => {
         this.tableData = res.data.data;
