@@ -130,7 +130,7 @@ export default {
       return type;
     },
     transferTime(utcTime) {
-      const time = moment(utcTime * 1000).format("YYYY-MM-DD HH:mm:ss");
+      const time = moment(utcTime).local().format("YYYY-MM-DD HH:mm:ss");
 
       return time;
     },
