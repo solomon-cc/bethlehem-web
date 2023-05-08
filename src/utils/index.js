@@ -133,6 +133,10 @@ export function typeFilter(object) {
     type = 'brand color'
   } else if (object == 0) {
     type = 'danger'
+  } else if (object == 5) {
+    type = 'Info'
+  } else {
+    type = 'Warning'
   }
   return type
 }
@@ -145,6 +149,12 @@ export function statusFilter(object) {
     status = '集体'
   } else if (object == 0) {
     status = '缺勤'
+  } else if (object == 3) {
+    status = '影子'
+  } else if (object == 4) {
+    status = '辅课'
+  } else if (object == 5) {
+    status = '衔接'
   }
   return status
 }
