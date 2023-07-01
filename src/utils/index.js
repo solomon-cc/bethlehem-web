@@ -127,12 +127,16 @@ export function utc2beijing(utcTime) {
 
 export function typeFilter(object) {
   let type = ''
-  if (object === 1) {
+  if (object === 0) {
+    type = 'danger'
+  } else if (object === 1) {
     type = 'success'
   } else if (object === 2) {
-    type = 'brand color'
-  } else if (object === 0) {
-    type = 'danger'
+    type = '#80CBC4'
+  } else if (object === 3) {
+    type = '#3949AB'
+  } else if (object === 4) {
+    type = '#00BCD4'
   } else if (object === 5) {
     type = 'Info'
   } else {
@@ -143,17 +147,17 @@ export function typeFilter(object) {
 
 export function statusFilter(object) {
   let status = ''
-  if (object == 1) {
+  if (object === 1) {
     status = '个训'
-  } else if (object == 2) {
+  } else if (object === 2) {
     status = '集体'
-  } else if (object == 0) {
+  } else if (object === 0) {
     status = '缺勤'
-  } else if (object == 3) {
+  } else if (object === 3) {
     status = '影子'
-  } else if (object == 4) {
+  } else if (object === 4) {
     status = '辅课'
-  } else if (object == 5) {
+  } else if (object === 5) {
     status = '衔接'
   }
   return status
