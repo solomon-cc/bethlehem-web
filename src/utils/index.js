@@ -136,7 +136,7 @@ export function typeFilter(object) {
   } else if (object === 3) {
     type = '#3949AB'
   } else if (object === 4) {
-    type = '#00BCD4'
+    type = '#FBC02D'
   } else if (object === 5) {
     type = 'Info'
   } else {
