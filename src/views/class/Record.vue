@@ -319,7 +319,7 @@ export default {
         this.query_form.start_at = moment(this.date[0]).format(
           'YYYY-MM-DD HH:mm:ss'
         )
-        this.query_form.end_at = moment(this.date[1]).format(
+        this.query_form.end_at = moment(this.date[1]).endOf('day').format(
           'YYYY-MM-DD HH:mm:ss'
         )
       }

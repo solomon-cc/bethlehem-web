@@ -127,13 +127,13 @@ export function utc2beijing(utcTime) {
 
 export function typeFilter(object) {
   let type = ''
-  if (object == 1) {
+  if (object === 1) {
     type = 'success'
-  } else if (object == 2) {
+  } else if (object === 2) {
     type = 'brand color'
-  } else if (object == 0) {
+  } else if (object === 0) {
     type = 'danger'
-  } else if (object == 5) {
+  } else if (object === 5) {
     type = 'Info'
   } else {
     type = 'Warning'
