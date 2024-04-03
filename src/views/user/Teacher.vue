@@ -28,7 +28,7 @@
               <el-tag
                 :type="scope.row.status | colorFilter"
                 disable-transitions
-                >{{ scope.row.Status | Status }}</el-tag
+                >{{ scope.row.status | Status }}</el-tag
               >
             </template>
           </el-table-column>

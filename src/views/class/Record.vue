@@ -43,8 +43,8 @@
             <el-option
               v-for="item in teacher_list"
               :key="item.ID"
-              :label="item.Nickname"
-              :value="item.Nickname"
+              :label="item.nick_name"
+              :value="item.nick_name"
             />
           </el-select>
         </el-col>
