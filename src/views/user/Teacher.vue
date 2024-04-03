@@ -17,7 +17,7 @@
           height="500"
           style="width: 100%"
         >
-          <el-table-column prop="Nickname" label="姓名" width="200" />
+          <el-table-column prop="nick_name" label="姓名" width="200" />
           <el-table-column prop="created_at" label="创建日期" width="200">
             <template slot-scope="scope">
               {{ scope.row.CreatedAt | transferTime }}
@@ -89,8 +89,8 @@
                   <span>{{ createdAt | transferTime }}</span>
                 </el-form-item>
               </el-form>
-              <el-form-item label="姓名" prop="nickname">
-                <el-input v-model="form.nickname" style="width: 195px" />
+              <el-form-item label="姓名" prop="ni_name">
+                <el-input v-model="form.nick_name" style="width: 195px" />
               </el-form-item>
               <el-form-item label="用户名" prop="user_name">
                 <el-input v-model="form.user_name" style="width: 195px" />
@@ -151,7 +151,7 @@ export default {
       form: {
         id: undefined,
         user_name: "",
-        nickname: "",
+        nick_name: "",
         status: 0,
       },
       query_form: {
@@ -167,7 +167,7 @@ export default {
       isDelete: false,
       isEdit: false,
       rules: {
-        nickname: [
+        nick_name: [
           { required: true, message: "姓名不能为空", trigger: "blur" },
         ],
         user_name: [
