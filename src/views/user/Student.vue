@@ -101,7 +101,7 @@
                   placeholder="状态"
                   style="width: 195px"
                 >
-                  <el-option label="在线" value="1" />
+                  <el-option label="在园" value="1" />
                   <el-option label="离园" value="0" />
                 </el-select>
               </el-form-item>

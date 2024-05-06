@@ -119,7 +119,7 @@
 
 <script>
 import { typeFilter } from "@/utils";
-import { userList } from "@/api/user";
+import { userList,userUpdateByid } from "@/api/user";
 
 import moment from "moment";
 
@@ -190,26 +190,17 @@ export default {
     },
     submitForm() {
       this.$refs["form"].validate((valid) => {
-        // if (valid) {
-        //   if (this.isEdit) {
-        //     updateStudent(this.form).then((res) => {
-        //       if (res.code == 200) {
-        //         this.$message.success("更新成功");
-        //         this.open = false;
-        //         this.getStudentList();
-        //       }
-        //     });
-        //   } else {
-        //     this.form.status = "1";
-        //     createStudent(this.form).then((res) => {
-        //       if (res.code === 200) {
-        //         this.$message.success("新增成功");
-        //         this.open = false;
-        //         this.getStudentList();
-        //       }
-        //     });
-        //   }
-        // }
+        if (valid) {
+          if (this.isEdit) {
+            userUpdateByid(this.form).then((res) => {
+              if (res.code == 200) {
+                this.$message.success("更新成功");
+                this.open = false;
+                this.getUserList();
+              }
+            });
+          } 
+        }
       });
     },
 
@@ -243,12 +234,12 @@ export default {
     handleEdit(row) {
       this.open = true;
       this.isEdit = true;
-      this.title = row.Nickname;
+      this.title = row.nick_name;
       this.createdAt = row.CreatedAt;
 
       this.form.id = row.ID;
-      this.form.status = row.Status;
-      this.form.nickname = row.Nickname;
+      this.form.status = row.status;
+      this.form.nickname = row.nick_name;
       this.form.user_name = row.UserName;
     },
     cancel() {

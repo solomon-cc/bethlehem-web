@@ -21,3 +21,6 @@ export const Logout = (data) => request.delete(`api/v1/user/logout`, data)
 // user
 export const userList = (params) =>
   request.get(`/api/v1/user`, { params: params })
+
+export const userUpdateByid = (data) =>
+  request.put(`/api/v1/user`, data)
