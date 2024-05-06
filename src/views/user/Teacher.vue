@@ -128,9 +128,7 @@ export default {
     },
     submitForm() {
       userUpdateByid(this.form).then((res) => {
-        console.log(res.code)
         if (res.code == 200) {
-
           this.$message.success("更新成功");
           this.open = false;
           this.getUserList();
