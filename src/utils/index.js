@@ -132,15 +132,13 @@ export function typeFilter(object) {
   } else if (object === 1) {
     type = 'success'
   } else if (object === 2) {
-    type = '#80CBC4'
+    type = 'Warning'
   } else if (object === 3) {
     type = '#3949AB'
   } else if (object === 4) {
     type = '#FBC02D'
   } else if (object === 5) {
     type = 'Info'
-  } else {
-    type = 'Warning'
   }
   return type
 }
