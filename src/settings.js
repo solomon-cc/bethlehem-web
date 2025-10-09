@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '一粒麦子管理系统',
+  title: '课时管理系统后端',
 
   /**
    * @type {boolean} true | false
