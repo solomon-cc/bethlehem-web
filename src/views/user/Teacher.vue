@@ -9,7 +9,7 @@
 
       <el-col>
         <el-table v-loading="loading" :data="tableData" stripe height="500" style="width: 100%">
-          <el-table-column prop="nick_name" label="姓名" width="200" />
+          <el-table-column prop="Nickname" label="姓名" width="200" />
           <el-table-column prop="created_at" label="创建日期" width="200">
             <template slot-scope="scope">
               {{ scope.row.CreatedAt | transferTime }}
@@ -17,7 +17,7 @@
           </el-table-column>
           <el-table-column prop="status" label="状态" width="200" sortable>
             <template slot-scope="scope">
-              <el-tag :type="scope.row.status | colorFilter" disable-transitions>{{ scope.row.status | Status
+              <el-tag :type="scope.row.Status | colorFilter" disable-transitions>{{ scope.row.Status | Status
                 }}</el-tag>
             </template>
           </el-table-column>
