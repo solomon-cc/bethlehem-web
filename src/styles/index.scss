@@ -22,6 +22,7 @@ html, body {
 @media (max-width: 600px) {
   .app-container {
     padding: 12px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 20px));
   }
 }
 

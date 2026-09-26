@@ -28,7 +28,7 @@
     <!-- 右侧功能区 -->
     <div class="d-flex align-center">
       <!-- 全屏切换（桌面端） -->
-      <v-tooltip text="全屏切换" location="bottom">
+      <v-tooltip text="全屏切换" location="bottom" :disabled="mobile">
         <template #activator="{ props }">
           <v-btn
             v-bind="props"
@@ -42,7 +42,7 @@
       </v-tooltip>
 
       <!-- 主题切换 -->
-      <v-tooltip :text="theme.global.current.value.dark ? '切换到浅色模式' : '切换到深色模式'" location="bottom">
+      <v-tooltip :text="theme.global.current.value.dark ? '切换到浅色模式' : '切换到深色模式'" location="bottom" :disabled="mobile">
         <template #activator="{ props }">
           <v-btn
             v-bind="props"
@@ -93,7 +93,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useTheme } from 'vuetify'
+import { useTheme, useDisplay } from 'vuetify'
 import { useUserStore } from '@/store/user'
 import { useAppStore } from '@/store/app'
 import { confirm, message } from '@/utils/feedback'
@@ -101,6 +101,7 @@ import { confirm, message } from '@/utils/feedback'
 const route = useRoute()
 const router = useRouter()
 const theme = useTheme()
+const { mobile } = useDisplay()
 const userStore = useUserStore()
 const appStore = useAppStore()
 
@@ -123,7 +124,9 @@ function toggleSideBar() {
 }
 
 function toggleTheme() {
-  theme.global.name.value = theme.global.current.value.dark ? 'customLightTheme' : 'customDarkTheme'
+  const nextTheme = theme.global.current.value.dark ? 'customLightTheme' : 'customDarkTheme'
+  theme.global.name.value = nextTheme
+  localStorage.setItem('bethlehem_theme', nextTheme)
 }
 
 function toggleFullscreen() {

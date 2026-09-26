@@ -34,9 +34,13 @@ const customDarkTheme = {
   }
 }
 
+const savedTheme = typeof window !== 'undefined' && localStorage.getItem('bethlehem_theme')
+  ? localStorage.getItem('bethlehem_theme')
+  : 'customLightTheme'
+
 export default createVuetify({
   theme: {
-    defaultTheme: 'customLightTheme',
+    defaultTheme: savedTheme,
     themes: {
       customLightTheme,
       customDarkTheme

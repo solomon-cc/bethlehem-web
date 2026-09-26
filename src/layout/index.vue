@@ -14,6 +14,8 @@ import AppMain from './components/AppMain.vue'
 
 <style scoped>
 .layout-wrapper {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 </style>
