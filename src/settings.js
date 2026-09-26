@@ -1,16 +1,5 @@
-module.exports = {
-
+export default {
   title: '一粒麦子管理系统',
-
-  /**
-   * @type {boolean} true | false
-   * @description Whether fix the header
-   */
-  fixedHeader: false,
-
-  /**
-   * @type {boolean} true | false
-   * @description Whether show the logo in sidebar
-   */
-  sidebarLogo: false
+  fixedHeader: true,
+  sidebarLogo: true
 }

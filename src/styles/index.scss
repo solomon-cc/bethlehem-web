@@ -1,65 +1,58 @@
-@import './variables.scss';
-@import './mixin.scss';
-@import './transition.scss';
-@import './element-ui.scss';
-@import './sidebar.scss';
+// Global Base Styles for Bethlehem Admin (Vuetify 4)
 
-body {
+html, body {
   height: 100%;
-  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background-color: rgb(var(--v-theme-background));
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
-}
-
-label {
-  font-weight: 700;
-}
-
-html {
-  height: 100%;
-  box-sizing: border-box;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #app {
   height: 100%;
+  min-height: 100vh;
 }
 
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
+.app-container {
+  padding: 20px;
 }
 
-a:focus,
-a:active {
-  outline: none;
-}
-
-a,
-a:focus,
-a:hover {
-  cursor: pointer;
-  color: inherit;
-  text-decoration: none;
-}
-
-div:focus {
-  outline: none;
-}
-
-.clearfix {
-  &:after {
-    visibility: hidden;
-    display: block;
-    font-size: 0;
-    content: " ";
-    clear: both;
-    height: 0;
+@media (max-width: 600px) {
+  .app-container {
+    padding: 12px;
   }
 }
 
-// main-container global css
-.app-container {
-  padding: 20px;
+/* Responsive Table Enhancements */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.responsive-data-table {
+  table {
+    min-width: 620px;
+  }
+  th, td {
+    white-space: nowrap !important;
+  }
+}
+
+/* Page transitions */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
 }

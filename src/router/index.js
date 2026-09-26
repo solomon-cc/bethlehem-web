@@ -1,123 +1,79 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
+import Layout from '@/layout/index.vue'
 
-Vue.use(Router)
-
-/* Layout */
-import Layout from '@/layout'
-
-/**
- * Note: sub-menu only appear when route children.length >= 1
- * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
- *
- * hidden: true                   if set true, item will not show in the sidebar(default is false)
- * alwaysShow: true               if set true, will always show the root menu
- *                                if not set alwaysShow, when item has more than one children route,
- *                                it will becomes nested mode, otherwise not show the root menu
- * redirect: noRedirect           if set noRedirect will no redirect in the breadcrumb
- * name:'router-name'             the name is used by <keep-alive> (must set!!!)
- * meta : {
-    roles: ['admin','editor']    control the page roles (you can set multiple roles)
-    title: 'title'               the name show in sidebar and breadcrumb (recommend set)
-    icon: 'svg-name'/'el-icon-x' the icon show in the sidebar
-    breadcrumb: false            if set false, the item will hidden in breadcrumb(default is true)
-    activeMenu: '/example/list'  if set path, the sidebar will highlight the path you set
-  }
- */
-
-/**
- * constantRoutes
- * a base page that does not have permission requirements
- * all roles can be accessed
- */
 export const constantRoutes = [
   {
     path: '/login',
-    name: 'login',
-    component: () => import('@/views/login/index'),
+    name: 'Login',
+    component: () => import('@/views/login/index.vue'),
     hidden: true
   },
-
   {
     path: '/404',
-    component: () => import('@/views/404'),
+    name: 'NotFound',
+    component: () => import('@/views/404.vue'),
     hidden: true
   },
-
   {
     path: '/',
     component: Layout,
     redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
-    }]
+    children: [
+      {
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/dashboard/index.vue'),
+        meta: { title: '首页仪表盘', icon: 'mdi-view-dashboard-outline' }
+      }
+    ]
   },
-
   {
     path: '/class',
     component: Layout,
     redirect: '/class/record',
     name: 'Class',
-    meta: { title: '课时管理', icon: 'el-icon-s-help' },
+    meta: { title: '课时管理', icon: 'mdi-calendar-clock-outline' },
     children: [
       {
         path: 'record',
-        name: 'record',
-        component: () => import('@/views/class/Record'),
-        meta: { title: '课时记录', icon: 'table' }
-      },
-      {
-        path: 'todo',
-        name: 'todo',
-        meta: { title: 'todo', icon: 'tree' }
+        name: 'Record',
+        component: () => import('@/views/class/Record.vue'),
+        meta: { title: '课时记录', icon: 'mdi-clipboard-text-clock-outline' }
       }
     ]
   },
-
   {
     path: '/user',
     component: Layout,
     redirect: '/user/student',
-    meta: { title: '用户管理', icon: 'user' },
+    name: 'User',
+    meta: { title: '用户管理', icon: 'mdi-account-group-outline' },
     children: [
       {
         path: 'student',
         name: 'Student',
-        component: () => import('@/views/user/Student'),
-        meta: { title: '学生管理', icon: 'user' }
-
+        component: () => import('@/views/user/Student.vue'),
+        meta: { title: '学生管理', icon: 'mdi-school-outline' }
       },
       {
         path: 'teacher',
         name: 'Teacher',
-        component: () => import('@/views/user/Teacher'),
-        meta: {
-          title: '教师管理', icon: 'el-icon-s-check'
-        }
-
+        component: () => import('@/views/user/Teacher.vue'),
+        meta: { title: '教师管理', icon: 'mdi-account-tie-outline' }
       }
     ]
   },
-
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/404',
+    hidden: true
+  }
 ]
 
-const createRouter = () => new Router({
-  mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
+const router = createRouter({
+  history: createWebHistory(),
+  scrollBehavior: () => ({ top: 0 }),
   routes: constantRoutes
 })
-
-const router = createRouter()
-
-// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
-export function resetRouter() {
-  const newRouter = createRouter()
-  router.matcher = newRouter.matcher // reset router
-}
 
 export default router

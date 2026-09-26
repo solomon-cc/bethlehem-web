@@ -1,139 +1,152 @@
-/* eslint-disable quotes */
 <template>
-  <div class="navbar">
-    <hamburger
-      :is-active="sidebar.opened"
-      class="hamburger-container"
-      @toggleClick="toggleSideBar"
+  <v-app-bar elevation="1" height="56" class="px-2" color="surface">
+    <!-- 汉堡菜单折叠按钮 -->
+    <v-app-bar-nav-icon
+      variant="text"
+      density="comfortable"
+      class="mr-1 text-medium-emphasis"
+      @click="toggleSideBar"
     />
 
-    <breadcrumb class="breadcrumb-container" />
+    <!-- 桌面端动态面包屑 -->
+    <v-breadcrumbs :items="breadcrumbItems" class="pa-0 ml-1 d-none d-sm-flex">
+      <template #prepend>
+        <v-icon icon="mdi-home-outline" size="small" class="mr-1 text-medium-emphasis" />
+      </template>
+      <template #title="{ item }">
+        <span class="text-caption font-weight-medium">{{ item.title }}</span>
+      </template>
+    </v-breadcrumbs>
 
-    <div class="right-menu">
-      <el-dropdown class="avatar-container" trigger="click">
-        <div class="avatar-wrapper">
-          <img src="https://picsum.photos/id/103/80/80" class="user-avatar" />
-          <i class="el-icon-caret-bottom" />
-        </div>
-        <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <router-link to="/">
-            <el-dropdown-item> Home </el-dropdown-item>
-          </router-link>
-          <el-dropdown-item divided @click.native="logout">
-            <span style="display: block">Log Out</span>
-          </el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
+    <!-- 移动端简洁标题 -->
+    <div class="d-sm-none text-subtitle-2 font-weight-bold ml-1 text-truncate" style="max-width: 180px;">
+      {{ currentTitle }}
     </div>
-  </div>
+
+    <v-spacer />
+
+    <!-- 右侧功能区 -->
+    <div class="d-flex align-center">
+      <!-- 全屏切换（桌面端） -->
+      <v-tooltip text="全屏切换" location="bottom">
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            variant="text"
+            icon="mdi-fullscreen"
+            density="comfortable"
+            class="mr-1 text-medium-emphasis d-none d-sm-inline-flex"
+            @click="toggleFullscreen"
+          />
+        </template>
+      </v-tooltip>
+
+      <!-- 主题切换 -->
+      <v-tooltip :text="theme.global.current.value.dark ? '切换到浅色模式' : '切换到深色模式'" location="bottom">
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            variant="text"
+            :icon="theme.global.current.value.dark ? 'mdi-weather-night' : 'mdi-weather-sunny'"
+            density="comfortable"
+            class="mr-1 mr-sm-2 text-medium-emphasis"
+            @click="toggleTheme"
+          />
+        </template>
+      </v-tooltip>
+
+      <!-- 用户下拉操作菜单 -->
+      <v-menu min-width="180" rounded="lg" offset="8">
+        <template #activator="{ props }">
+          <v-btn v-bind="props" variant="text" density="comfortable" class="px-1 px-sm-2 py-1 user-btn">
+            <v-avatar size="32" class="mr-1 mr-sm-2">
+              <v-img :src="userAvatar" alt="Avatar" />
+            </v-avatar>
+            <span class="text-subtitle-2 font-weight-medium text-capitalize mr-1 d-none d-sm-inline-block">
+              {{ userName || '管理员' }}
+            </span>
+            <v-icon icon="mdi-chevron-down" size="small" class="text-medium-emphasis" />
+          </v-btn>
+        </template>
+
+        <v-list density="compact" nav class="pa-1">
+          <v-list-item
+            prepend-icon="mdi-home-outline"
+            title="首页"
+            to="/dashboard"
+            rounded="md"
+          />
+          <v-divider class="my-1" />
+          <v-list-item
+            prepend-icon="mdi-logout"
+            title="退出登录"
+            rounded="md"
+            class="text-error"
+            @click="handleLogout"
+          />
+        </v-list>
+      </v-menu>
+    </div>
+  </v-app-bar>
 </template>
 
-<script>
-import { mapGetters } from "vuex";
-import { Logout } from "@/api/user";
+<script setup>
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useTheme } from 'vuetify'
+import { useUserStore } from '@/store/user'
+import { useAppStore } from '@/store/app'
+import { confirm, message } from '@/utils/feedback'
 
-import Breadcrumb from "@/components/Breadcrumb";
-import Hamburger from "@/components/Hamburger";
+const route = useRoute()
+const router = useRouter()
+const theme = useTheme()
+const userStore = useUserStore()
+const appStore = useAppStore()
 
-export default {
-  components: {
-    Breadcrumb,
-    Hamburger,
-  },
-  computed: {
-    ...mapGetters(["sidebar", "avatar"]),
-  },
-  methods: {
-    toggleSideBar() {
-      this.$store.dispatch("app/toggleSideBar");
-    },
-    logout() {
-      Logout().then(() => {
-        localStorage.clear();
-        sessionStorage.clear();
-        // resetRouter();
-        this.$router.push("/login");
-      });
-    },
-  },
-};
+const userName = computed(() => userStore.name || userStore.user)
+const userAvatar = computed(() => userStore.avatar || 'https://picsum.photos/id/103/80/80')
+const currentTitle = computed(() => route.meta?.title || '一粒麦子')
+
+// Dynamic Breadcrumbs
+const breadcrumbItems = computed(() => {
+  const matched = route.matched.filter(item => item.meta && item.meta.title)
+  return matched.map(item => ({
+    title: item.meta.title,
+    disabled: item.path === route.path,
+    to: item.path
+  }))
+})
+
+function toggleSideBar() {
+  appStore.toggleSideBar()
+}
+
+function toggleTheme() {
+  theme.global.name.value = theme.global.current.value.dark ? 'customLightTheme' : 'customDarkTheme'
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen()
+  } else if (document.exitFullscreen) {
+    document.exitFullscreen()
+  }
+}
+
+function handleLogout() {
+  confirm('确定要退出当前登录账号吗？', '提示')
+    .then(() => {
+      userStore.logout()
+      message.success('已安全退出')
+      router.push('/login')
+    })
+    .catch(() => {})
+}
 </script>
 
-<style lang="scss" scoped>
-.navbar {
-  height: 50px;
-  overflow: hidden;
-  position: relative;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
-
-  .hamburger-container {
-    line-height: 46px;
-    height: 100%;
-    float: left;
-    cursor: pointer;
-    transition: background 0.3s;
-    -webkit-tap-highlight-color: transparent;
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.025);
-    }
-  }
-
-  .breadcrumb-container {
-    float: left;
-  }
-
-  .right-menu {
-    float: right;
-    height: 100%;
-    line-height: 50px;
-
-    &:focus {
-      outline: none;
-    }
-
-    .right-menu-item {
-      display: inline-block;
-      padding: 0 8px;
-      height: 100%;
-      font-size: 18px;
-      color: #5a5e66;
-      vertical-align: text-bottom;
-
-      &.hover-effect {
-        cursor: pointer;
-        transition: background 0.3s;
-
-        &:hover {
-          background: rgba(0, 0, 0, 0.025);
-        }
-      }
-    }
-
-    .avatar-container {
-      margin-right: 30px;
-
-      .avatar-wrapper {
-        margin-top: 5px;
-        position: relative;
-
-        .user-avatar {
-          cursor: pointer;
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
-        }
-
-        .el-icon-caret-bottom {
-          cursor: pointer;
-          position: absolute;
-          right: -20px;
-          top: 25px;
-          font-size: 12px;
-        }
-      }
-    }
-  }
+<style scoped>
+.user-btn {
+  text-transform: none;
 }
 </style>

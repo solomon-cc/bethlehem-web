@@ -1,11 +1,17 @@
 <template>
-  <div id="app">
+  <v-app>
     <router-view />
-  </div>
+    <global-feedback />
+  </v-app>
 </template>
 
-<script>
-export default {
-  name: 'App'
-}
+<script setup>
+import GlobalFeedback from '@/components/GlobalFeedback.vue'
 </script>
+
+<style>
+/* Global basic overrides if needed */
+html, body {
+  overflow-y: auto !important;
+}
+</style>

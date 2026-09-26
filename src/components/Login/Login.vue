@@ -1,188 +1,134 @@
 <template>
-  <div class="login">
-    <el-card>
-      <h2>Login</h2>
-      <el-form
-        ref="form"
-        class="login-form"
-        :model="model"
-        :rules="rules"
-        @submit.native.prevent="login"
-      >
-        <el-form-item prop="username">
-          <el-input
-            v-model="model.username"
-            placeholder="Username"
-            prefix-icon="fas fa-user"
-          />
-        </el-form-item>
-        <el-form-item prop="password">
-          <el-input
-            v-model="model.password"
-            placeholder="Password"
-            type="password"
-            prefix-icon="fas fa-lock"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            :loading="loading"
-            class="login-button"
-            type="primary"
-            native-type="submit"
-            block
-            >Login</el-button
-          >
-        </el-form-item>
-        <a class="forgot-password" href="https://app.ylmz.com.cn/"
-          >Forgot password ?</a
+  <div class="login-wrapper">
+    <v-card class="login-card pa-6 pa-sm-8" elevation="4" rounded="xl" max-width="400" width="100%">
+      <div class="text-center mb-6">
+        <v-avatar color="primary" size="48" class="mb-3 elevation-2">
+          <v-icon icon="mdi-shield-account-outline" color="white" size="28" />
+        </v-avatar>
+        <h2 class="text-h5 font-weight-bold text-high-emphasis">欢迎登录</h2>
+        <p class="text-caption text-medium-emphasis mt-1">请输入您的账号与密码访问系统</p>
+      </div>
+
+      <v-form ref="formRef" v-model="isValid" @submit.prevent="handleLogin">
+        <v-text-field
+          v-model="model.username"
+          label="用户名"
+          placeholder="请输入用户名"
+          prepend-inner-icon="mdi-account-outline"
+          :rules="usernameRules"
+          variant="outlined"
+          density="comfortable"
+          class="mb-3"
+        />
+
+        <v-text-field
+          v-model="model.password"
+          label="密码"
+          placeholder="请输入密码"
+          prepend-inner-icon="mdi-lock-outline"
+          :append-inner-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+          :type="showPassword ? 'text' : 'password'"
+          :rules="passwordRules"
+          variant="outlined"
+          density="comfortable"
+          class="mb-2"
+          @click:append-inner="showPassword = !showPassword"
+        />
+
+        <div class="d-flex justify-end mb-4">
+          <a href="https://app.ylmz.com.cn/" target="_blank" class="text-caption text-primary text-decoration-none py-1">
+            忘记密码？
+          </a>
+        </div>
+
+        <v-btn
+          type="submit"
+          color="primary"
+          block
+          size="large"
+          elevation="2"
+          rounded="lg"
+          :loading="loading"
         >
-      </el-form>
-    </el-card>
+          立即登录
+        </v-btn>
+      </v-form>
+    </v-card>
   </div>
 </template>
 
-<script>
-import { login } from "@/api/user";
+<script setup>
+import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { login } from '@/api/user'
+import { useUserStore } from '@/store/user'
+import { message } from '@/utils/feedback'
 
-export default {
-  name: "Login",
-  data() {
-    return {
-      model: {
-        username: "",
-        password: "",
-      },
-      loading: false,
-      rules: {
-        username: [
-          {
-            required: true,
-            message: "Username is required",
-            trigger: "blur",
-          },
-          {
-            min: 4,
-            message: "Username length should be at least 5 characters",
-            trigger: "blur",
-          },
-        ],
-        password: [
-          { required: true, message: "Password is required", trigger: "blur" },
-          {
-            min: 5,
-            message: "Password length should be at least 5 characters",
-            trigger: "blur",
-          },
-        ],
-      },
-    };
-  },
-  methods: {
-    simulateLogin() {
-      login({
-        user_name: this.model.username,
-        password: this.model.password,
-      }).then((res) => {
-        if (res.code == "200") {
-          const loginData = {
-            user: res.data.user_name,
-            id: res.data.id,
-            nick_name: res.data["nickname"],
-            token: res.data.token,
-          };
-          this.$store.commit("login", loginData);
-          this.$router.push("Dashboard");
-        }
-      });
-    },
-    login() {
-      this.$refs.form.validate((valid) => {
-        if (!valid) {
-          return;
-        } else {
-          this.loading = true;
-          this.simulateLogin();
-          this.loading = false;
-        }
-      });
-    },
-  },
-};
+const router = useRouter()
+const userStore = useUserStore()
+
+const formRef = ref(null)
+const isValid = ref(false)
+const loading = ref(false)
+const showPassword = ref(false)
+
+const model = reactive({
+  username: '',
+  password: ''
+})
+
+const usernameRules = [
+  v => !!v || '请输入用户名',
+  v => (v && v.length >= 3) || '用户名至少需 3 个字符'
+]
+
+const passwordRules = [
+  v => !!v || '请输入密码',
+  v => (v && v.length >= 4) || '密码至少需 4 个字符'
+]
+
+async function handleLogin() {
+  const { valid } = await formRef.value.validate()
+  if (!valid) return
+
+  loading.value = true
+  try {
+    const res = await login({
+      user_name: model.username,
+      password: model.password
+    })
+
+    if (res.code === 200 || res.code === '200') {
+      const loginData = {
+        user: res.data.user_name,
+        id: res.data.id,
+        nick_name: res.data.nickname || res.data.nick_name || res.data.user_name,
+        token: res.data.token
+      }
+      userStore.login(loginData)
+      message.success('登录成功，欢迎回来！')
+      router.push('/dashboard')
+    }
+  } catch (error) {
+    console.error('Login error:', error)
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.login {
-  flex: 1;
+.login-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.login-button {
   width: 100%;
-  margin-top: 40px;
+  padding: 0 16px;
 }
-.login-form {
-  width: 290px;
-}
-.forgot-password {
-  margin-top: 10px;
-}
-</style>
-<style lang="scss" scoped>
-$teal: rgb(0, 124, 137);
-.el-button--primary {
-  background: $teal;
-  border-color: $teal;
 
-  &:hover,
-  &.active,
-  &:focus {
-    background: lighten($teal, 7);
-    border-color: lighten($teal, 7);
-  }
-}
-.login .el-input__inner:hover {
-  border-color: $teal;
-}
-.login .el-input__prefix {
-  background: rgb(238, 237, 234);
-  left: 0;
-  height: calc(100% - 2px);
-  left: 1px;
-  top: 1px;
-  border-radius: 3px;
-  .el-input__icon {
-    width: 30px;
-  }
-}
-.login .el-input input {
-  padding-left: 35px;
-}
-.login .el-card {
-  padding-top: 0;
-  padding-bottom: 30px;
-}
-h2 {
-  font-family: "Open Sans";
-  letter-spacing: 1px;
-  font-family: Roboto, sans-serif;
-  padding-bottom: 20px;
-}
-a {
-  color: $teal;
-  text-decoration: none;
-  &:hover,
-  &:active,
-  &:focus {
-    color: lighten($teal, 7);
-  }
-}
-.login .el-card {
-  width: 340px;
-  display: flex;
-  justify-content: center;
+.login-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 </style>

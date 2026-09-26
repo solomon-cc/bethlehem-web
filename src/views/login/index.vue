@@ -1,91 +1,50 @@
 <template>
-  <div id="app" class="body">
-    <div class="header">
-      <h2 class="logo">一粒麦子后台管理系统</h2>
+  <div class="login-page">
+    <div class="header text-center pt-6 pt-sm-8 px-4">
+      <div class="d-inline-flex align-center">
+        <v-icon icon="mdi-grain" size="32" color="white" class="mr-2" />
+        <h1 class="text-h5 text-sm-h4 font-weight-bold text-white tracking-wide">
+          一粒麦子后台管理系统
+        </h1>
+      </div>
     </div>
-    <Login />
 
-    <div class="footer">
-      <div class="version">
-        成都一粒麦子医疗科技有限公司 蜀ICP备2021025805号
+    <div class="content-body py-6 py-sm-8 px-4">
+      <login-form />
+    </div>
+
+    <div class="footer text-center pb-6 px-4">
+      <div class="text-caption text-white" style="opacity: 0.88;">
+        成都一粒麦子医疗科技有限公司 · 蜀ICP备2021025805号
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import Login from '@/components/Login/Login.vue'
-
-export default {
-  name: 'App',
-  components: {
-    Login
-  }
-}
+<script setup>
+import LoginForm from '@/components/Login/Login.vue'
 </script>
 
-<style lang="scss" scoped>
-#app {
-  font-family: Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin: 0;
+<style scoped>
+.login-page {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   min-height: 100vh;
-}
-.body {
-  margin: 0;
-  padding: 0;
-  background-image: url("../../assets/login.jpg");
+  width: 100%;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.65)), url("@/assets/login.jpg");
   background-size: cover;
+  background-position: center;
 }
-.footer,
-.header {
-  padding: 20px 20px;
-  color: #f0f4f8;
+
+.content-body {
+  flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  h1,
-  h2,
-  h3 {
-    color: #f0f4f8;
-    padding: 0;
-    margin: 0;
-  }
-  .links {
-    display: flex;
-    font-family: "Open Sans";
-    span {
-      padding: 0 10px;
-      font-size: 18px;
-      border-right: 1px solid #9fb3c8;
-      &:last-child {
-        border-right: none;
-      }
-    }
-  }
-  .version {
-    font-family: "Open Sans";
-    padding: 0 10px;
-    color: #f0f4f8;
-    font-size: 12px;
-    margin-top: 5px;
-  }
+  justify-content: center;
 }
-.header {
-  padding: 10px 20px;
-  .logo {
-    font-family: "Open Sans";
-    letter-spacing: 3px;
-    padding-top: 15px;
-    padding-bottom: 15px;
-  }
-  .logo .part-2 {
-    color: #d64545;
-  }
+
+.tracking-wide {
+  letter-spacing: 1.5px;
 }
 </style>

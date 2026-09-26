@@ -1,291 +1,403 @@
 <template>
   <div class="app-container">
-    <el-row>
-      <el-col>
-        <el-col :span="4" :push="20">
-          <el-button type="primary" icon="el-icon-plus" @click="handleAdd"
-            >新增学生</el-button
-          >
-        </el-col>
-      </el-col>
-
-      <el-col>
-        <el-table
-          v-loading="loading"
-          :data="tableData"
-          stripe
-          height="500"
-          style="width: 100%"
-        >
-          <el-table-column prop="nick_name" label="姓名" width="200" />
-          <el-table-column prop="created_at" label="创建日期" width="200">
-            <template slot-scope="scope">
-              {{ scope.row.created_at | transferTime }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="status" label="状态" width="200" sortable>
-            <template slot-scope="scope">
-              <el-tag
-                :type="scope.row.status | colorFilter"
-                disable-transitions
-                >{{ scope.row.status | Status }}</el-tag
-              >
-            </template>
-          </el-table-column>
-          <el-table-column fixed="right" label="操作" width="100">
-            <template slot-scope="scope">
-              <el-button type="text" size="small" @click="handleEdit(scope.row)"
-                >编辑</el-button
-              >
-              <el-button
-                type="text"
-                size="small"
-                @click="handleDelete(scope.row)"
-                >删除</el-button
-              >
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-pagination
-          :current-page="query_form.page_num"
-          :page-sizes="[20, 30, 50]"
-          :page-size="query_form.page_size"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-
-        <el-dialog
-          :title="title"
-          :visible.sync="open"
-          width="40%"
-          :close-on-click-modal="false"
-        >
-          <el-form
-            ref="form"
-            label-position="right"
-            :model="form"
-            :rules="rules"
-            label-width="120px"
-          >
-            <el-form
-              ref="form"
-              :model="form"
-              :rules="rules"
-              label-width="120px"
-            >
-              <el-form
-                ref="form"
-                :model="form"
-                :rules="rules"
-                label-width="120px"
-              >
-                <el-form-item
-                  v-show="isEdit"
-                  label="创建时间"
-                  prop="created_at"
-                >
-                  <span>{{ createdAt | transferTime }}</span>
-                </el-form-item>
-              </el-form>
-              <el-form-item label="姓名" prop="nickname">
-                <el-input v-model="form.nickname" style="width: 195px" />
-              </el-form-item>
-              <el-form-item label="用户名" prop="user_name">
-                <el-input v-model="form.user_name" style="width: 195px" />
-              </el-form-item>
-              <el-form-item label="状态" prop="status">
-                <el-select
-                  v-model="form.status"
-                  placeholder="状态"
-                  style="width: 195px"
-                >
-                  <el-option label="在园" value="1" />
-                  <el-option label="离园" value="0" />
-                </el-select>
-              </el-form-item>
-            </el-form>
-            <el-form-item label="头像地址" prop="avatar">
-              <el-input
-                v-model="form.avatar"
-                style="width: 280px"
-                type="textarea"
-              />
-            </el-form-item>
-          </el-form>
-          <div slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="submitForm">确 定</el-button>
-            <el-button @click="cancel">取 消</el-button>
+    <!-- 顶部操作栏 -->
+    <v-card elevation="1" rounded="lg" class="pa-4 mb-4">
+      <div class="d-flex flex-column flex-sm-row align-start align-sm-center justify-space-between gap-3">
+        <div class="d-flex align-center mb-3 mb-sm-0">
+          <v-avatar color="primary" variant="tonal" rounded="lg" size="40" class="mr-3">
+            <v-icon icon="mdi-school-outline" size="24" />
+          </v-avatar>
+          <div>
+            <h3 class="text-subtitle-1 font-weight-bold">学生档案管理</h3>
+            <span class="text-caption text-medium-emphasis">管理在园学员基础档案与状态信息</span>
           </div>
-        </el-dialog>
-      </el-col>
-    </el-row>
+        </div>
+
+        <div class="d-flex align-center w-100 w-sm-auto justify-end">
+          <v-btn
+            color="primary"
+            prepend-icon="mdi-plus"
+            elevation="1"
+            rounded="lg"
+            class="flex-grow-1 flex-sm-grow-0"
+            @click="handleAdd"
+          >
+            新增学生
+          </v-btn>
+        </div>
+      </div>
+    </v-card>
+
+    <!-- 数据表格卡片 -->
+    <v-card elevation="1" rounded="lg" class="overflow-hidden">
+      <div class="table-responsive">
+        <v-data-table
+          :headers="headers"
+          :items="tableData"
+          :loading="loading"
+          hover
+          density="comfortable"
+          class="elevation-0 responsive-data-table"
+          :items-per-page="query_form.page_size"
+          hide-default-footer
+        >
+          <!-- 头像与姓名组合展示 -->
+          <template #item.nick_name="{ item }">
+            <div class="d-flex align-center py-1 text-no-wrap">
+              <v-avatar size="36" color="teal-lighten-4" class="mr-3 elevation-1">
+                <v-img v-if="item.avatar" :src="item.avatar" alt="Avatar">
+                  <template #error>
+                    <v-icon icon="mdi-account" color="teal" />
+                  </template>
+                </v-img>
+                <v-icon v-else icon="mdi-account" color="teal" />
+              </v-avatar>
+              <div>
+                <div class="font-weight-medium text-body-2">{{ item.nick_name || '-' }}</div>
+                <div class="text-caption text-medium-emphasis">账号: {{ item.user_name || '-' }}</div>
+              </div>
+            </div>
+          </template>
+
+          <!-- 创建日期（过滤异常零值负数时间戳） -->
+          <template #item.created_at="{ item }">
+            <div class="text-body-2 text-medium-emphasis text-no-wrap">
+              {{ formatTimestamp(item.created_at, item.updated_at) }}
+            </div>
+          </template>
+
+          <!-- 状态列 -->
+          <template #item.status="{ item }">
+            <v-chip
+              :color="item.status == 1 ? 'success' : 'grey'"
+              size="small"
+              variant="flat"
+              class="font-weight-medium text-no-wrap"
+            >
+              <v-icon
+                :icon="item.status == 1 ? 'mdi-check-circle' : 'mdi-close-circle'"
+                start
+                size="14"
+              />
+              {{ item.status == 1 ? '在园' : '离园' }}
+            </v-chip>
+          </template>
+
+          <!-- 操作列 -->
+          <template #item.actions="{ item }">
+            <div class="d-flex justify-end align-center text-no-wrap pr-1">
+              <v-tooltip text="编辑学员" location="top">
+                <template #activator="{ props }">
+                  <v-btn
+                    v-bind="props"
+                    icon="mdi-pencil-outline"
+                    density="comfortable"
+                    variant="text"
+                    color="primary"
+                    class="mr-1"
+                    @click="handleEdit(item)"
+                  />
+                </template>
+              </v-tooltip>
+              <v-tooltip text="删除学员" location="top">
+                <template #activator="{ props }">
+                  <v-btn
+                    v-bind="props"
+                    icon="mdi-delete-outline"
+                    density="comfortable"
+                    variant="text"
+                    color="error"
+                    @click="handleDelete(item)"
+                  />
+                </template>
+              </v-tooltip>
+            </div>
+          </template>
+
+          <!-- 无数据 -->
+          <template #no-data>
+            <div class="py-8 text-center text-medium-emphasis">
+              <v-icon icon="mdi-account-off-outline" size="48" class="mb-2 opacity-40" />
+              <p>暂无学生档案记录</p>
+            </div>
+          </template>
+        </v-data-table>
+      </div>
+
+      <!-- 分页栏 -->
+      <v-divider />
+      <div class="d-flex flex-wrap align-center justify-space-between px-4 py-3">
+        <div class="d-flex align-center my-1">
+          <span class="text-caption text-medium-emphasis mr-2">每页行数:</span>
+          <v-select
+            v-model="query_form.page_size"
+            :items="[10, 20, 30, 50]"
+            density="compact"
+            variant="outlined"
+            hide-details
+            style="max-width: 90px;"
+            @update:model-value="handleSearch"
+          />
+        </div>
+
+        <v-pagination
+          v-model="query_form.page_num"
+          :length="pageCount"
+          :total-visible="5"
+          rounded="circle"
+          size="small"
+          density="comfortable"
+          color="primary"
+          class="my-1"
+          @update:model-value="getStudentList"
+        />
+      </div>
+    </v-card>
+
+    <!-- 新增 / 编辑弹窗 -->
+    <v-dialog v-model="open" max-width="520" persistent>
+      <v-card rounded="xl" class="pa-4">
+        <v-card-title class="d-flex align-center justify-space-between pb-2">
+          <span class="text-h6 font-weight-bold">
+            {{ isEdit ? '编辑学生档案 - ' + title : '新增学生档案' }}
+          </span>
+          <v-btn icon="mdi-close" variant="text" size="small" @click="cancel" />
+        </v-card-title>
+        <v-divider class="mb-4" />
+
+        <v-card-text class="pa-0">
+          <v-form ref="formRef" v-model="isValid">
+            <v-row dense>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="form.nickname"
+                  label="学生姓名"
+                  placeholder="请输入姓名"
+                  prepend-inner-icon="mdi-account-outline"
+                  variant="outlined"
+                  density="comfortable"
+                  :rules="[v => !!v || '学生姓名不能为空']"
+                  class="mb-2"
+                />
+              </v-col>
+
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="form.user_name"
+                  label="登录用户名"
+                  placeholder="请输入登录用户名"
+                  prepend-inner-icon="mdi-badge-account-outline"
+                  variant="outlined"
+                  density="comfortable"
+                  :rules="[v => !!v || '登录用户名不能为空']"
+                  class="mb-2"
+                />
+              </v-col>
+
+              <v-col cols="12">
+                <v-select
+                  v-model="form.status"
+                  label="在园状态"
+                  :items="[
+                    { title: '在园', value: '1' },
+                    { title: '离园', value: '0' }
+                  ]"
+                  prepend-inner-icon="mdi-list-status"
+                  variant="outlined"
+                  density="comfortable"
+                  class="mb-2"
+                />
+              </v-col>
+
+              <v-col cols="12">
+                <v-text-field
+                  v-model="form.avatar"
+                  label="头像地址 (URL)"
+                  placeholder="https://..."
+                  prepend-inner-icon="mdi-image-outline"
+                  variant="outlined"
+                  density="comfortable"
+                  class="mb-2"
+                />
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-card-text>
+
+        <v-card-actions class="pt-4 justify-end">
+          <v-btn variant="text" @click="cancel">取消</v-btn>
+          <v-btn
+            color="primary"
+            variant="flat"
+            :loading="submitLoading"
+            @click="submitForm"
+          >
+            {{ isEdit ? '保存更新' : '立即新增' }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
-<script>
-import { typeFilter } from "@/utils";
+<script setup>
+import { ref, reactive, computed, onMounted } from 'vue'
 import {
   studentList,
   createStudent,
   updateStudent,
-  deleteStudent,
-} from "@/api/student";
+  deleteStudent
+} from '@/api/student'
+import { message, confirm } from '@/utils/feedback'
+import moment from 'moment'
 
-import moment from "moment";
+const headers = [
+  { title: '学生姓名 / 账号', key: 'nick_name', minWidth: '160px', align: 'start' },
+  { title: '创建日期', key: 'created_at', minWidth: '170px', align: 'start' },
+  { title: '在园状态', key: 'status', minWidth: '110px', align: 'start' },
+  { title: '操作', key: 'actions', minWidth: '110px', align: 'end', sortable: false }
+]
 
-export default {
-  filters: {
-    colorFilter(object) {
-      const type = typeFilter(object);
-      return type;
-    },
-    transferTime(utcTime) {
-      const time = moment(utcTime * 1000).format("YYYY-MM-DD HH:mm:ss");
+const loading = ref(false)
+const submitLoading = ref(false)
+const total = ref(0)
+const tableData = ref([])
+const open = ref(false)
+const isEdit = ref(false)
+const title = ref('')
+const isValid = ref(false)
+const formRef = ref(null)
 
-      return time;
-    },
+const query_form = reactive({
+  page_num: 1,
+  page_size: 20
+})
 
-    Status(object) {
-      let status = "";
-      if (object == 1) {
-        status = "在线";
-      } else if (object == 0) {
-        status = "离园";
+const form = reactive({
+  id: undefined,
+  student_id: undefined,
+  user_name: '',
+  nickname: '',
+  status: '1',
+  avatar: ''
+})
+
+const pageCount = computed(() => {
+  return Math.ceil(total.value / query_form.page_size) || 1
+})
+
+function formatTimestamp(createTime, updateTime) {
+  // 防御性检查：过滤 Go 语言零值或负数时间戳（如 -62135596800）
+  const validTime = (createTime && createTime > 0) ? createTime : (updateTime && updateTime > 0 ? updateTime : null)
+  if (!validTime) return '-'
+  const timestamp = typeof validTime === 'number' && validTime < 10000000000 ? validTime * 1000 : validTime
+  return moment(timestamp).format('YYYY-MM-DD HH:mm:ss')
+}
+
+async function getStudentList() {
+  loading.value = true
+  try {
+    const res = await studentList(query_form)
+    if (res?.data) {
+      tableData.value = res.data.data || []
+      total.value = res.data.total || 0
+    }
+  } catch (err) {
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
+}
+
+function handleSearch() {
+  query_form.page_num = 1
+  getStudentList()
+}
+
+function handleAdd() {
+  resetForm()
+  isEdit.value = false
+  open.value = true
+}
+
+function handleEdit(row) {
+  isEdit.value = true
+  title.value = row.nick_name
+  form.id = row.id
+  form.student_id = row.student_id
+  form.status = String(row.status)
+  form.nickname = row.nick_name
+  form.user_name = row.user_name
+  form.avatar = row.avatar || ''
+  open.value = true
+}
+
+async function submitForm() {
+  const { valid } = await formRef.value.validate()
+  if (!valid) return
+
+  submitLoading.value = true
+  try {
+    if (isEdit.value) {
+      const res = await updateStudent(form)
+      if (res.code === 200 || res.code === '200') {
+        message.success('学生档案更新成功')
+        open.value = false
+        getStudentList()
       }
-      return status;
-    },
-  },
-  data() {
-    return {
-      date: "",
-      form: {
-        id: undefined,
-        student_id: undefined,
-        user_name: "",
-        nickname: "",
-        status: 0,
-        avatar: "",
-      },
-      query_form: {
-        page_num: 1,
-        page_size: 20,
-      },
-      createdAt: "",
-      total: 0,
-      title: "",
-      open: false,
-      tableData: [],
-      loading: true,
-      isDelete: false,
-      isEdit: false,
-      rules: {
-        nickname: [
-          { required: true, message: "学生姓名不能为空", trigger: "blur" },
-        ],
-        user_name: [
-          { required: true, message: "学生用户名不能为空", trigger: "blur" },
-        ],
-        avatar: [{ required: true, message: "头像不能为空", trigger: "blur" }],
-      },
-    };
-  },
-  mounted() {
-    this.getStudentList();
-  },
-  methods: {
-    getStudentList() {
-      studentList(this.query_form).then((res) => {
-        this.tableData = res.data.data;
-        this.total = res.data.total;
-        this.loading = false;
-      });
-    },
-    submitForm() {
-      this.$refs["form"].validate((valid) => {
-        if (valid) {
-          if (this.isEdit) {
-            updateStudent(this.form).then((res) => {
-              if (res.code == 200) {
-                this.$message.success("更新成功");
-                this.open = false;
-                this.getStudentList();
-              }
-            });
-          } else {
-            this.form.status = "1";
-            createStudent(this.form).then((res) => {
-              if (res.code === 200) {
-                this.$message.success("新增成功");
-                this.open = false;
+    } else {
+      const res = await createStudent(form)
+      if (res.code === 200 || res.code === '200') {
+        message.success('学生档案新增成功')
+        open.value = false
+        getStudentList()
+      }
+    }
+  } catch (err) {
+    console.error(err)
+  } finally {
+    submitLoading.value = false
+  }
+}
 
-                this.getStudentList();
-              }
-            });
-          }
+function handleDelete(row) {
+  confirm(`确认移除学生【${row.nick_name}】的档案信息吗？`, '删除确认')
+    .then(async () => {
+      try {
+        const res = await deleteStudent(row)
+        if (res.code === 200 || res.code === '200') {
+          message.success('删除成功')
+          getStudentList()
         }
-      });
-    },
+      } catch (err) {
+        console.error(err)
+      }
+    })
+    .catch(() => {})
+}
 
-    handleAdd() {
-      this.reset();
-      this.open = true;
-      this.isEdit = false;
-    },
-    handleSizeChange: function (size) {
-      this.query_form.page_size = size;
-      this.getStudentList();
-    },
-    handleCurrentChange: function (currentPage) {
-      this.query_form.page_num = currentPage;
-      this.getStudentList();
-    },
-    handleDelete(row) {
-      this.$confirm("确认移除记录?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(() => {
-        deleteStudent(row).then((res) => {
-          if (res.code === 200) {
-            this.$message.success("删除成功");
-            this.getStudentList();
-          }
-        });
-      });
-    },
-    handleEdit(row) {
-      this.open = true;
-      this.isEdit = true;
-      this.title = row.nick_name;
-      this.createdAt = row.created_at;
+function cancel() {
+  open.value = false
+}
 
-      this.form.id = row.id;
-      this.form.student_id = row.student_id;
-      this.form.status = row.status;
-      this.form.nickname = row.nick_name;
-      this.form.user_name = row.user_name;
-      this.form.avatar = row.avatar;
-    },
-    cancel() {
-      this.open = false;
-    },
-    reset() {
-      this.form = {
-        id: undefined,
-        student_id: undefined,
-        user_name: "",
-        nickname: "",
-        status: 0,
-        avatar: "",
-      };
-    },
-  },
-};
+function resetForm() {
+  form.id = undefined
+  form.student_id = undefined
+  form.user_name = ''
+  form.nickname = ''
+  form.status = '1'
+  form.avatar = ''
+}
+
+onMounted(() => {
+  getStudentList()
+})
 </script>
+
 <style scoped>
-.query-select {
-  width: 100px;
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 </style>
