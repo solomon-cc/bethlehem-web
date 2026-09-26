@@ -29,7 +29,7 @@
 
     <!-- 核心统计指标 -->
     <v-row class="mb-6">
-      <v-col cols="12" sm="6" lg="3">
+      <v-col cols="12" sm="4">
         <v-card elevation="1" rounded="lg" class="pa-4 metric-card cursor-pointer" to="/user/student">
           <div class="d-flex justify-space-between align-center">
             <div>
@@ -43,7 +43,7 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12" sm="6" lg="3">
+      <v-col cols="12" sm="4">
         <v-card elevation="1" rounded="lg" class="pa-4 metric-card cursor-pointer" to="/user/teacher">
           <div class="d-flex justify-space-between align-center">
             <div>
@@ -57,7 +57,7 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12" sm="6" lg="3">
+      <v-col cols="12" sm="4">
         <v-card elevation="1" rounded="lg" class="pa-4 metric-card cursor-pointer" to="/class/record">
           <div class="d-flex justify-space-between align-center">
             <div>
@@ -67,25 +67,6 @@
             <v-avatar color="indigo" variant="tonal" rounded="lg" size="48">
               <v-icon icon="mdi-clipboard-text-clock-outline" size="28" />
             </v-avatar>
-          </div>
-        </v-card>
-      </v-col>
-
-      <v-col cols="12" sm="6" lg="3">
-        <v-card elevation="1" rounded="lg" class="pa-4 metric-card">
-          <div class="d-flex justify-space-between align-center">
-            <div>
-              <span class="text-caption text-medium-emphasis font-weight-medium">系统运行状态</span>
-              <div class="text-h6 font-weight-bold mt-2 text-success d-flex align-center">
-                <v-icon icon="mdi-check-circle" size="18" class="mr-1" /> 正常在线
-              </div>
-            </div>
-            <v-avatar color="success" variant="tonal" rounded="lg" size="48">
-              <v-icon icon="mdi-server-network" size="28" />
-            </v-avatar>
-          </div>
-          <div class="text-caption text-medium-emphasis mt-3">
-            <span>服务节点：西南一区</span>
           </div>
         </v-card>
       </v-col>

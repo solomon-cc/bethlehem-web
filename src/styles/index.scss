@@ -34,10 +34,26 @@ html, body {
 
 .responsive-data-table {
   table {
-    min-width: 620px;
+    width: 100%;
   }
   th, td {
     white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .responsive-data-table {
+    .v-table__wrapper > table > thead > tr > th,
+    .v-table__wrapper > table > tbody > tr > td {
+      padding-left: 8px !important;
+      padding-right: 8px !important;
+    }
+  }
+}
+
+@media (min-width: 600px) {
+  .responsive-data-table table {
+    min-width: 600px;
   }
 }
 

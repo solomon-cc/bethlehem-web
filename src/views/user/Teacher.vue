@@ -44,12 +44,17 @@
           <!-- 姓名与账号 -->
           <template #item.nick_name="{ item }">
             <div class="d-flex align-center py-1 text-no-wrap">
-              <v-avatar size="36" color="teal-lighten-4" class="mr-3 elevation-1">
+              <v-avatar :size="mobile ? 32 : 36" color="teal-lighten-4" :class="mobile ? 'mr-2' : 'mr-3'" class="elevation-1">
                 <v-icon icon="mdi-account-tie" color="teal-darken-2" />
               </v-avatar>
               <div>
                 <div class="font-weight-medium text-body-2">{{ item.nick_name }}</div>
-                <div class="text-caption text-medium-emphasis">账号: {{ item.UserName || item.user_name || '-' }}</div>
+                <div class="text-caption text-medium-emphasis">
+                  账号: {{ item.UserName || item.user_name || '-' }}
+                  <span v-if="mobile" class="d-block text-caption text-medium-emphasis" style="font-size: 11px;">
+                    {{ formatTime(item.CreatedAt || item.created_at) }}
+                  </span>
+                </div>
               </div>
             </div>
           </template>
@@ -225,16 +230,28 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useDisplay } from 'vuetify'
 import { userList, userUpdateByid } from '@/api/user'
 import { message, confirm } from '@/utils/feedback'
 import moment from 'moment'
 
-const headers = [
-  { title: '教师姓名 / 账号', key: 'nick_name', minWidth: '160px', align: 'start' },
-  { title: '创建日期', key: 'created_at', minWidth: '170px', align: 'start' },
-  { title: '在职状态', key: 'status', minWidth: '110px', align: 'start' },
-  { title: '操作', key: 'actions', minWidth: '110px', align: 'end', sortable: false }
-]
+const { mobile } = useDisplay()
+
+const headers = computed(() => {
+  if (mobile.value) {
+    return [
+      { title: '教师信息', key: 'nick_name', align: 'start' },
+      { title: '状态', key: 'status', align: 'center', width: '64px' },
+      { title: '操作', key: 'actions', align: 'end', width: '84px', sortable: false }
+    ]
+  }
+  return [
+    { title: '教师姓名 / 账号', key: 'nick_name', minWidth: '160px', align: 'start' },
+    { title: '创建日期', key: 'created_at', minWidth: '170px', align: 'start' },
+    { title: '在职状态', key: 'status', minWidth: '110px', align: 'start' },
+    { title: '操作', key: 'actions', minWidth: '110px', align: 'end', sortable: false }
+  ]
+})
 
 const loading = ref(false)
 const submitLoading = ref(false)

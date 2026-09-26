@@ -106,6 +106,9 @@
           <template #item.name="{ item }">
             <div class="font-weight-medium text-body-2 text-no-wrap">
               {{ item.name || item.nick_name || '-' }}
+              <div v-if="mobile" class="text-caption text-medium-emphasis" style="font-size: 11px;">
+                老师: {{ item.user_name || '-' }}
+              </div>
             </div>
           </template>
 
@@ -118,9 +121,21 @@
 
           <!-- 打卡时间列 -->
           <template #item.created_at="{ item }">
-            <div class="d-flex align-center text-body-2 text-no-wrap">
-              <v-icon icon="mdi-clock-outline" size="16" class="mr-1 text-medium-emphasis" />
-              <span>{{ formatDateTime(item.created_at) }}</span>
+            <div class="d-flex flex-column text-body-2 text-no-wrap">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-clock-outline" size="14" class="mr-1 text-medium-emphasis" />
+                <span :style="mobile ? 'font-size: 12px;' : ''">{{ formatDateTime(item.created_at) }}</span>
+              </div>
+              <div v-if="mobile" class="mt-1">
+                <v-chip
+                  :color="getStatusColor(item.status)"
+                  size="x-small"
+                  variant="flat"
+                  class="font-weight-medium"
+                >
+                  {{ getStatusLabel(item.status) }}
+                </v-chip>
+              </div>
             </div>
           </template>
 
@@ -275,19 +290,31 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
+import { useDisplay } from 'vuetify'
 import { listRecord, deleteRecord, updateRecord } from '@/api/record'
 import { studentListAll } from '@/api/student'
 import { userList } from '@/api/user'
 import { message, confirm } from '@/utils/feedback'
 import moment from 'moment'
 
-const headers = [
-  { title: '学生姓名', key: 'name', minWidth: '120px', align: 'start' },
-  { title: '任课老师', key: 'user_name', minWidth: '120px', align: 'start' },
-  { title: '打卡日期', key: 'created_at', minWidth: '180px', align: 'start' },
-  { title: '课程类型', key: 'status', minWidth: '110px', align: 'start' },
-  { title: '操作', key: 'actions', minWidth: '110px', align: 'end', sortable: false }
-]
+const { mobile } = useDisplay()
+
+const headers = computed(() => {
+  if (mobile.value) {
+    return [
+      { title: '学生 / 教师', key: 'name', align: 'start' },
+      { title: '打卡信息 / 类型', key: 'created_at', align: 'start' },
+      { title: '操作', key: 'actions', align: 'end', width: '56px', sortable: false }
+    ]
+  }
+  return [
+    { title: '学生姓名', key: 'name', minWidth: '120px', align: 'start' },
+    { title: '任课老师', key: 'user_name', minWidth: '120px', align: 'start' },
+    { title: '打卡日期', key: 'created_at', minWidth: '180px', align: 'start' },
+    { title: '课程类型', key: 'status', minWidth: '110px', align: 'start' },
+    { title: '操作', key: 'actions', minWidth: '110px', align: 'end', sortable: false }
+  ]
+})
 
 const loading = ref(false)
 const submitLoading = ref(false)
