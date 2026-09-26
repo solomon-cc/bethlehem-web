@@ -131,8 +131,8 @@
 
       <!-- 分页栏 -->
       <v-divider />
-      <div class="d-flex flex-wrap align-center justify-space-between px-4 py-3">
-        <div class="d-flex align-center my-1">
+      <div class="d-flex flex-column flex-sm-row align-center justify-space-between px-3 px-sm-4 py-3 gap-2">
+        <div class="d-flex align-center justify-center justify-sm-start w-100 w-sm-auto mb-2 mb-sm-0">
           <span class="text-caption text-medium-emphasis mr-2">每页行数:</span>
           <v-select
             v-model="query_form.page_size"
@@ -145,17 +145,19 @@
           />
         </div>
 
-        <v-pagination
-          v-model="query_form.page_num"
-          :length="pageCount"
-          :total-visible="5"
-          rounded="circle"
-          size="small"
-          density="comfortable"
-          color="primary"
-          class="my-1"
-          @update:model-value="getStudentList"
-        />
+        <div class="d-flex justify-center w-100 w-sm-auto">
+          <v-pagination
+            v-model="query_form.page_num"
+            :length="pageCount"
+            :total-visible="mobile ? 4 : 5"
+            rounded="circle"
+            size="small"
+            density="comfortable"
+            color="primary"
+            class="my-0"
+            @update:model-value="getStudentList"
+          />
+        </div>
       </div>
     </v-card>
 

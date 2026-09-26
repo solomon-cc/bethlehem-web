@@ -13,10 +13,10 @@
 
 <style scoped>
 .app-main {
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+  min-height: calc(100vh - 56px);
+  min-height: calc(100dvh - 56px);
+  height: auto;
+  overflow: visible;
   background-color: rgb(var(--v-theme-background));
 }
 </style>

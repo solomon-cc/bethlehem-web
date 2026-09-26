@@ -1,18 +1,23 @@
 // Global Base Styles for Bethlehem Admin (Vuetify 4)
 
 html, body {
-  height: 100%;
+  min-height: 100%;
+  height: auto;
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   background-color: rgb(var(--v-theme-background));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 #app {
-  height: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
 }
 
 .app-container {
@@ -22,8 +27,25 @@ html, body {
 @media (max-width: 600px) {
   .app-container {
     padding: 12px;
-    padding-bottom: calc(24px + env(safe-area-inset-bottom, 20px));
+    padding-bottom: calc(40px + env(safe-area-inset-bottom, 24px));
   }
+}
+
+/* Fixed Layout Headers & Sidebar */
+.v-toolbar.v-app-bar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  z-index: 1000 !important;
+}
+
+.v-navigation-drawer {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  z-index: 1001 !important;
 }
 
 /* Responsive Table Enhancements */
