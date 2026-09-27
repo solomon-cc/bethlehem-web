@@ -7,7 +7,8 @@
       :timeout="feedbackState.snackbar.timeout"
       :location="mobile ? 'top' : 'top right'"
       rounded="lg"
-      elevation="4"
+      elevation="6"
+      style="z-index: 3100"
     >
       <div class="d-flex align-center">
         <v-icon

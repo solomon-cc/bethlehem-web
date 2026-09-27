@@ -45,7 +45,7 @@
           <template #item.nick_name="{ item }">
             <div class="d-flex align-center py-1 text-no-wrap">
               <v-avatar :size="mobile ? 32 : 36" color="teal-lighten-4" :class="mobile ? 'mr-2' : 'mr-3'" class="elevation-1">
-                <v-img v-if="item.avatar" :src="item.avatar" alt="Avatar">
+                <v-img v-if="item.avatar" :src="item.avatar" alt="Avatar" referrerpolicy="no-referrer">
                   <template #error>
                     <v-icon icon="mdi-account" color="teal" />
                   </template>
@@ -174,6 +174,88 @@
 
         <v-card-text class="pa-0">
           <v-form ref="formRef" v-model="isValid">
+            <!-- 头像上传区域 -->
+            <div class="avatar-upload-container d-flex flex-column align-center justify-center py-2 mb-3">
+              <div class="avatar-wrapper position-relative" @click="triggerUpload">
+                <v-avatar size="88" color="surface-variant" class="avatar-preview elevation-1 cursor-pointer">
+                  <v-img v-if="form.avatar" :src="form.avatar" cover referrerpolicy="no-referrer">
+                    <template #placeholder>
+                      <div class="d-flex align-center justify-center fill-height">
+                        <v-progress-circular indeterminate color="primary" size="24" />
+                      </div>
+                    </template>
+                    <template #error>
+                      <v-icon icon="mdi-account" size="48" color="grey-darken-1" />
+                    </template>
+                  </v-img>
+                  <v-icon v-else icon="mdi-account-outline" size="48" color="grey-darken-1" />
+
+                  <!-- 上传中遮罩 -->
+                  <v-overlay
+                    :model-value="uploading"
+                    contained
+                    class="align-center justify-center"
+                    scrim="rgba(0,0,0,0.5)"
+                  >
+                    <v-progress-circular indeterminate color="white" size="32" />
+                  </v-overlay>
+
+                  <!-- 悬浮遮罩 (上传提示) -->
+                  <div v-if="!uploading" class="avatar-hover-mask d-flex flex-column align-center justify-center">
+                    <v-icon icon="mdi-camera" color="white" size="24" />
+                    <span class="text-caption text-white mt-1">更换头像</span>
+                  </div>
+                </v-avatar>
+
+                <!-- 移除按钮 -->
+                <v-btn
+                  v-if="form.avatar && !uploading"
+                  icon="mdi-close"
+                  size="x-small"
+                  color="error"
+                  variant="flat"
+                  class="avatar-delete-btn elevation-2"
+                  title="移除头像"
+                  @click.stop="handleAvatarRemove"
+                />
+              </div>
+
+              <!-- 上传按钮与操作 -->
+              <div class="d-flex align-center gap-2 mt-2">
+                <v-btn
+                  variant="tonal"
+                  size="small"
+                  color="primary"
+                  prepend-icon="mdi-cloud-upload-outline"
+                  :loading="uploading"
+                  @click="triggerUpload"
+                >
+                  {{ form.avatar ? '重新选择' : '上传头像' }}
+                </v-btn>
+                <v-btn
+                  v-if="form.avatar"
+                  variant="text"
+                  size="small"
+                  color="grey-darken-1"
+                  @click="handleAvatarRemove"
+                >
+                  清除
+                </v-btn>
+              </div>
+              <div class="text-caption text-medium-emphasis mt-1">
+                格式自动转换为 AVIF，命名规范为【{{ form.nickname ? form.nickname + '.avif' : '学生名.avif' }}】
+              </div>
+
+              <!-- 隐藏的文件选择 input -->
+              <input
+                ref="fileInputRef"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/jpg"
+                class="d-none"
+                @change="handleFileSelected"
+              />
+            </div>
+
             <v-row dense>
               <v-col cols="12" sm="6">
                 <v-text-field
@@ -219,11 +301,12 @@
               <v-col cols="12">
                 <v-text-field
                   v-model="form.avatar"
-                  label="头像地址 (URL)"
-                  placeholder="https://..."
+                  label="头像地址 (OSS CDN)"
+                  placeholder="上传头像后自动生成，也可手动填写 URL"
                   prepend-inner-icon="mdi-image-outline"
                   variant="outlined"
-                  density="comfortable"
+                  density="compact"
+                  hide-details
                   class="mb-2"
                 />
               </v-col>
@@ -257,6 +340,8 @@ import {
   deleteStudent
 } from '@/api/student'
 import { message, confirm } from '@/utils/feedback'
+import { uploadStudentAvatar } from '@/api/upload'
+import { convertImageToAvif } from '@/utils/oss'
 import moment from 'moment'
 
 const { mobile } = useDisplay()
@@ -286,6 +371,8 @@ const isEdit = ref(false)
 const title = ref('')
 const isValid = ref(false)
 const formRef = ref(null)
+const uploading = ref(false)
+const fileInputRef = ref(null)
 
 const query_form = reactive({
   page_num: 1,
@@ -349,6 +436,57 @@ function handleEdit(row) {
   form.user_name = row.user_name
   form.avatar = row.avatar || ''
   open.value = true
+}
+
+function triggerUpload() {
+  if (uploading.value) return
+  if (!form.nickname || !form.nickname.trim()) {
+    message.warning('请先输入学生姓名，头像将自动以学生姓名命名')
+    return
+  }
+  fileInputRef.value?.click()
+}
+
+async function handleFileSelected(event) {
+  const file = event.target?.files?.[0]
+  if (!file) return
+
+  const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
+  if (!validTypes.includes(file.type)) {
+    message.error('请选择有效的图片文件 (JPG, PNG, WebP)')
+    if (fileInputRef.value) fileInputRef.value.value = ''
+    return
+  }
+
+  if (file.size > 10 * 1024 * 1024) {
+    message.error('图片文件大小不能超过 10MB')
+    if (fileInputRef.value) fileInputRef.value.value = ''
+    return
+  }
+
+  uploading.value = true
+  try {
+    const studentName = form.nickname.trim()
+    const avifBlob = await convertImageToAvif(file)
+    const res = await uploadStudentAvatar(avifBlob, studentName)
+    if (res.code === 200 && res.data?.url) {
+      form.avatar = res.data.url
+      message.success(`头像上传成功并命名为【${studentName}.avif】`)
+    } else {
+      throw new Error(res.msg || '头像上传失败')
+    }
+  } catch (err) {
+    console.error('上传头像失败:', err)
+    message.error(err.message || '头像上传失败')
+  } finally {
+    uploading.value = false
+    if (fileInputRef.value) fileInputRef.value.value = ''
+  }
+}
+
+function handleAvatarRemove() {
+  form.avatar = ''
+  if (fileInputRef.value) fileInputRef.value.value = ''
 }
 
 async function submitForm() {
@@ -418,5 +556,48 @@ onMounted(() => {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.avatar-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.avatar-preview {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+  border: 2px dashed rgba(var(--v-theme-primary), 0.35);
+}
+
+.avatar-preview:hover {
+  border-color: rgb(var(--v-theme-primary));
+}
+
+.avatar-preview:hover .avatar-hover-mask {
+  opacity: 1;
+}
+
+.avatar-hover-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.avatar-delete-btn {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  z-index: 2;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>
